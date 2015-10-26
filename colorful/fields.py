@@ -1,5 +1,8 @@
 from __future__ import unicode_literals
 
+# FIXME Use dummy color class if colorutils is not available
+from colorutils import Color
+
 from django.core.checks import Error
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -8,10 +11,32 @@ from django.db.models import CharField
 from . import forms, widgets
 
 
+class ColorDescriptor(object):
+    def __init__(self, field):
+        self.field = field
+
+    def __get__(self, verbose_name=None, instance=None, owner=None):
+        if instance is None:
+            raise AttributeError(
+                "The '%s' attribute can only be accessed from %s instances."
+                % (self.field.name, owner.__name__))
+
+        color_hex_value = instance.__dict__[self.field.name]
+        return Color(hex=color_hex_value)
+
+    def __set__(self, obj, value):
+        if isinstance(value, Color):
+            obj.__dict__[self.field.name] = value.hex
+        else:
+            obj.__dict__[self.field.name] = value
+
+
 class RGBColorField(CharField):
     """Field for database models"""
     widget = widgets.ColorFieldWidget
     default_validators = [RegexValidator(regex=forms.RGB_REGEX)]
+
+    descriptor_class = ColorDescriptor
 
     def __init__(self, colors=None, *args, **kwargs):
         self.colors = colors
@@ -55,3 +80,7 @@ class RGBColorField(CharField):
                         id='colorful.E002'
                     ))
         return errors
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(RGBColorField, self).contribute_to_class(cls, name, **kwargs)
+        setattr(cls, self.name, self.descriptor_class(self))
