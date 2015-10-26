@@ -15,7 +15,7 @@ class ColorDescriptor(object):
     def __init__(self, field):
         self.field = field
 
-    def __get__(self, verbose_name=None, instance=None, owner=None):
+    def __get__(self, instance=None, owner=None):
         if instance is None:
             raise AttributeError(
                 "The '%s' attribute can only be accessed from %s instances."
@@ -38,7 +38,7 @@ class RGBColorField(CharField):
 
     descriptor_class = ColorDescriptor
 
-    def __init__(self, colors=None, *args, **kwargs):
+    def __init__(self, verbose_name=None, colors=None, *args, **kwargs):
         self.colors = colors
         kwargs['max_length'] = 7
         super(RGBColorField, self).__init__(*args, **kwargs)
