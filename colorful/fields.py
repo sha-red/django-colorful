@@ -1,17 +1,16 @@
 from __future__ import unicode_literals
 
-# FIXME Use dummy color class if colorutils is not available
-from colorutils import Color
-
 from django.core.checks import Error
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.db.models import CharField
+from django.db.models import CharField, NOT_PROVIDED
 
-from . import forms, widgets
+from . import forms, widgets, Color, smart_hex
 
 
 class ColorDescriptor(object):
+    DEFAULT_COLOR = '#000000'
+
     def __init__(self, field):
         self.field = field
 
@@ -22,13 +21,17 @@ class ColorDescriptor(object):
                 % (self.field.name, owner.__name__))
 
         color_hex_value = instance.__dict__[self.field.name]
+        if not color_hex_value:
+            if self.field.colors:
+                color_hex_value = self.field.colors[0]
+            elif self.field.default is not NOT_PROVIDED:
+                color_hex_value = self.field.default
+            else:
+                color_hex_value = self.DEFAULT_COLOR
         return Color(hex=color_hex_value)
 
     def __set__(self, obj, value):
-        if isinstance(value, Color):
-            obj.__dict__[self.field.name] = value.hex
-        else:
-            obj.__dict__[self.field.name] = value
+        obj.__dict__[self.field.name] = smart_hex(value or self.DEFAULT_COLOR)
 
 
 class RGBColorField(CharField):
@@ -84,3 +87,17 @@ class RGBColorField(CharField):
     def contribute_to_class(self, cls, name, **kwargs):
         super(RGBColorField, self).contribute_to_class(cls, name, **kwargs)
         setattr(cls, self.name, self.descriptor_class(self))
+
+    # def pre_save(self, model_instance, add):
+    #     return smart_hex(getattr(model_instance, self.attname))
+
+    # def get_prep_value(self, value):
+    #     value = super(RGBColorField, self).get_prep_value(value)
+    #     return smart_hex(value)
+
+    def to_python(self, value):
+        return super(RGBColorField, self).to_python(smart_hex(value))
+
+    # def bound_data(self, data, initial):
+    #     return super(RGBColorField, self).bound_data(smart_hex(data), smart_hex(initial))
+

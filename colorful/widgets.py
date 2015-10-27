@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 import json
+# FIXME Use dummy color class if colorutils is not available
+from colorutils import Color
 
 from django.forms.widgets import TextInput
 from django.utils.safestring import mark_safe
@@ -44,6 +46,8 @@ class ColorFieldWidget(TextInput):
 
     def render(self, name, value, attrs={}):
         parts = []
+        if isinstance(value, Color):
+            value = value.hex
         if 'id' not in attrs:
             attrs['id'] = "id_%s" % name
         if self.colors:
