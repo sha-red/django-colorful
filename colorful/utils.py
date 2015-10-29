@@ -5,6 +5,9 @@ from __future__ import unicode_literals
 from colorutils import Color as ColorBase
 
 
+DEFAULT_COLOR = '#000000'
+
+
 class Color(ColorBase):
     def as_css_color(self):
         return "rgb{}".format(self.rgb)
@@ -14,6 +17,6 @@ def smart_hex(color_or_hex):
     if isinstance(color_or_hex, Color):
         return color_or_hex.hex
     else:
-        return Color(hex=color_or_hex).hex
+        return Color(hex=color_or_hex or DEFAULT_COLOR).hex
 
 
