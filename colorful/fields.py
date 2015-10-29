@@ -5,7 +5,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db.models import CharField, NOT_PROVIDED
 
-from . import forms, widgets, Color, smart_hex
+from . import forms, widgets
+from .utils import Color, smart_hex
 
 
 class ColorDescriptor(object):

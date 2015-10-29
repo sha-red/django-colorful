@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 from colorful import VERSION
 
-github_url = 'https://github.com/charettes/django-colorful'
+github_url = 'https://github.com/sha-red/django-colorful'
 
 setup(
     name='django-colorful',
@@ -15,6 +15,7 @@ setup(
     author_email='charette.s@gmail.com',
     requires=[
         'Django (>=1.7)',
+        'colorutils',
     ],
     packages=find_packages(),
     include_package_data=True,

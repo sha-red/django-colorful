@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
 import json
-# FIXME Use dummy color class if colorutils is not available
-from colorutils import Color
 
 from django.forms.widgets import TextInput
 from django.utils.safestring import mark_safe
+
+from .utils import Color
 
 
 class ColorFieldWidget(TextInput):
