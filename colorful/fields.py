@@ -99,6 +99,10 @@ class RGBColorField(CharField):
     def to_python(self, value):
         return super(RGBColorField, self).to_python(smart_hex(value))
 
+    def value_to_string(self, obj):
+        value = self._get_val_from_obj(obj)
+        return smart_hex(value)
+
     # def bound_data(self, data, initial):
     #     return super(RGBColorField, self).bound_data(smart_hex(data), smart_hex(initial))
 
